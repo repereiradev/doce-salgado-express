@@ -4,9 +4,20 @@ import { Button } from "@/components/ui/button";
 interface HeaderProps {
   cartCount: number;
   onCartClick: () => void;
+  onQuemSomosClick: () => void;
+  onProdutosClick: () => void;
+  onPoliticasClick: () => void;
+  onContatosClick: () => void;
 }
 
-const Header = ({ cartCount, onCartClick }: HeaderProps) => {
+const Header = ({ 
+  cartCount, 
+  onCartClick, 
+  onQuemSomosClick, 
+  onProdutosClick, 
+  onPoliticasClick, 
+  onContatosClick 
+}: HeaderProps) => {
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -26,22 +37,28 @@ const Header = ({ cartCount, onCartClick }: HeaderProps) => {
 
         <nav className="hidden md:flex items-center space-x-6">
           <button 
-            onClick={() => scrollToSection('salgados')}
-            className="text-foreground hover:text-primary transition-colors"
+            onClick={onQuemSomosClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
           >
-            Salgados
+            Quem Somos
           </button>
           <button 
-            onClick={() => scrollToSection('doces')}
-            className="text-foreground hover:text-primary transition-colors"
+            onClick={onProdutosClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
           >
-            Doces
+            Os nossos Produtos
           </button>
           <button 
-            onClick={() => scrollToSection('bolos')}
-            className="text-foreground hover:text-primary transition-colors"
+            onClick={onPoliticasClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
           >
-            Bolos
+            Políticas
+          </button>
+          <button 
+            onClick={onContatosClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
+          >
+            Contatos
           </button>
         </nav>
 

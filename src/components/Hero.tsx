@@ -1,6 +1,8 @@
+import heroBakery from "@/assets/hero-bakery.jpg";
+
 const Hero = () => {
   const scrollToProducts = () => {
-    const element = document.getElementById('salgados');
+    const element = document.getElementById('produtos');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
@@ -28,7 +30,7 @@ const Hero = () => {
             Cada produto é preparado com carinho e ingredientes selecionados.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <button
               onClick={scrollToProducts}
               className="bg-gradient-button text-primary-foreground px-8 py-4 rounded-full text-lg font-medium shadow-floating hover:shadow-lg transform hover:scale-105 transition-all duration-300"
@@ -41,9 +43,18 @@ const Hero = () => {
               <span className="text-sm">Entrega rápida • Produtos frescos</span>
             </div>
           </div>
+
+          {/* Imagem do hero */}
+          <div className="max-w-4xl mx-auto mb-8">
+            <img
+              src={heroBakery}
+              alt="Delícias caseiras artesanais"
+              className="w-full h-64 md:h-80 object-cover rounded-2xl shadow-card"
+            />
+          </div>
         </div>
 
-        <div className="mt-16 grid grid-cols-3 gap-8 max-w-md mx-auto">
+        <div className="mt-8 grid grid-cols-3 gap-8 max-w-md mx-auto">
           <div className="text-center">
             <div className="w-16 h-16 bg-category-salgados rounded-full mx-auto mb-2 flex items-center justify-center shadow-soft">
               <span className="text-2xl">🥟</span>

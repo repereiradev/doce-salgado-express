@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
-import ProductSection from "@/components/ProductSection";
+import ProductTabs from "@/components/ProductTabs";
 import CartModal, { CartItem } from "@/components/CartModal";
+import QuemSomosModal from "@/components/modals/QuemSomosModal";
+import ProdutosModal from "@/components/modals/ProdutosModal";
+import PoliticasModal from "@/components/modals/PoliticasModal";
+import ContatosModal from "@/components/modals/ContatosModal";
+import { CookieBanner, CookieCustomizationModal, CookiePolicyModal, CookiePreferences } from "@/components/CookieConsent";
 import { Product } from "@/components/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 
@@ -17,6 +22,13 @@ import bolo2 from "@/assets/bolo-2.jpg";
 const CatalogoPage = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isQuemSomosOpen, setIsQuemSomosOpen] = useState(false);
+  const [isProdutosOpen, setIsProdutosOpen] = useState(false);
+  const [isPoliticasOpen, setIsPoliticasOpen] = useState(false);
+  const [isContatosOpen, setIsContatosOpen] = useState(false);
+  const [isCookiePolicyOpen, setIsCookiePolicyOpen] = useState(false);
+  const [isCookieCustomizationOpen, setIsCookieCustomizationOpen] = useState(false);
+  const [showCookieBanner, setShowCookieBanner] = useState(false);
   const { toast } = useToast();
 
   // Carregar carrinho do localStorage
@@ -24,6 +36,14 @@ const CatalogoPage = () => {
     const savedCart = localStorage.getItem('deliciasCart');
     if (savedCart) {
       setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Verificar se precisa mostrar banner de cookies
+  useEffect(() => {
+    const cookieConsent = localStorage.getItem('cookieConsent');
+    if (!cookieConsent) {
+      setShowCookieBanner(true);
     }
   }, []);
 
@@ -137,39 +157,71 @@ const CatalogoPage = () => {
     localStorage.removeItem('deliciasCart');
   };
 
+  const handleCookieAccept = () => {
+    const preferences: CookiePreferences = {
+      necessary: true,
+      analytics: true,
+      marketing: true,
+      personalization: true,
+    };
+    localStorage.setItem('cookieConsent', JSON.stringify(preferences));
+    setShowCookieBanner(false);
+    
+    toast({
+      title: "Preferências guardadas",
+      description: "Todas as categorias de cookies foram aceites.",
+    });
+  };
+
+  const handleCookieReject = () => {
+    const preferences: CookiePreferences = {
+      necessary: true,
+      analytics: false,
+      marketing: false,
+      personalization: false,
+    };
+    localStorage.setItem('cookieConsent', JSON.stringify(preferences));
+    setShowCookieBanner(false);
+    
+    toast({
+      title: "Preferências guardadas",
+      description: "Apenas cookies necessários serão utilizados.",
+    });
+  };
+
+  const handleCookieCustomize = () => {
+    setIsCookieCustomizationOpen(true);
+  };
+
+  const handleCookiePreferencesSave = (preferences: CookiePreferences) => {
+    localStorage.setItem('cookieConsent', JSON.stringify(preferences));
+    setShowCookieBanner(false);
+    
+    toast({
+      title: "Preferências guardadas",
+      description: "As suas preferências de cookies foram atualizadas.",
+    });
+  };
+
   const cartCount = cartItems.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <div className="min-h-screen bg-background">
-      <Header cartCount={cartCount} onCartClick={() => setIsCartOpen(true)} />
+      <Header 
+        cartCount={cartCount} 
+        onCartClick={() => setIsCartOpen(true)}
+        onQuemSomosClick={() => setIsQuemSomosOpen(true)}
+        onProdutosClick={() => setIsProdutosOpen(true)}
+        onPoliticasClick={() => setIsPoliticasOpen(true)}
+        onContatosClick={() => setIsContatosOpen(true)}
+      />
       
       <Hero />
       
-      <ProductSection
-        id="salgados"
-        title="Salgados"
-        emoji="🥟"
-        products={salgados}
-        onAddToCart={addToCart}
-      />
-      
-      <div className="h-px bg-border/50"></div>
-      
-      <ProductSection
-        id="doces"
-        title="Doces"
-        emoji="🧁"
-        products={doces}
-        onAddToCart={addToCart}
-      />
-      
-      <div className="h-px bg-border/50"></div>
-      
-      <ProductSection
-        id="bolos"
-        title="Bolos"
-        emoji="🎂"
-        products={bolos}
+      <ProductTabs
+        salgados={salgados}
+        doces={doces}
+        bolos={bolos}
         onAddToCart={addToCart}
       />
 
@@ -183,7 +235,7 @@ const CatalogoPage = () => {
               Sabores autênticos feitos com amor e ingredientes selecionados. 
               Entre em contacto connosco para encomendar os seus produtos favoritos!
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm text-muted-foreground">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm text-muted-foreground mb-6">
               <div className="flex items-center">
                 <span className="w-2 h-2 bg-primary rounded-full mr-2"></span>
                 Produtos frescos diariamente
@@ -197,10 +249,21 @@ const CatalogoPage = () => {
                 Qualidade garantida
               </div>
             </div>
+            
+            {/* Link para política de cookies */}
+            <div className="border-t border-border/50 pt-4">
+              <button
+                onClick={() => setIsCookiePolicyOpen(true)}
+                className="text-primary hover:text-primary/80 underline text-sm transition-colors"
+              >
+                Política de Cookies
+              </button>
+            </div>
           </div>
         </div>
       </footer>
 
+      {/* Modais */}
       <CartModal
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
@@ -209,6 +272,46 @@ const CatalogoPage = () => {
         onRemoveItem={removeItem}
         onClearCart={clearCart}
       />
+
+      <QuemSomosModal
+        isOpen={isQuemSomosOpen}
+        onClose={() => setIsQuemSomosOpen(false)}
+      />
+
+      <ProdutosModal
+        isOpen={isProdutosOpen}
+        onClose={() => setIsProdutosOpen(false)}
+      />
+
+      <PoliticasModal
+        isOpen={isPoliticasOpen}
+        onClose={() => setIsPoliticasOpen(false)}
+      />
+
+      <ContatosModal
+        isOpen={isContatosOpen}
+        onClose={() => setIsContatosOpen(false)}
+      />
+
+      <CookiePolicyModal
+        isOpen={isCookiePolicyOpen}
+        onClose={() => setIsCookiePolicyOpen(false)}
+      />
+
+      <CookieCustomizationModal
+        isOpen={isCookieCustomizationOpen}
+        onClose={() => setIsCookieCustomizationOpen(false)}
+        onSave={handleCookiePreferencesSave}
+      />
+
+      {/* Banner de cookies */}
+      {showCookieBanner && (
+        <CookieBanner
+          onAccept={handleCookieAccept}
+          onReject={handleCookieReject}
+          onCustomize={handleCookieCustomize}
+        />
+      )}
     </div>
   );
 };
